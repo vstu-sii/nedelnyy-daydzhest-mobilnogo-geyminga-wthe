@@ -1,5 +1,5 @@
 # Неделный дайджест мобильного гейминга
-
+[![CI](https://github.com/vstu-sii/nedelnyy-daydzhest-mobilnogo-geyminga-wthe/actions/workflows/ci.yml/badge.svg)](https://github.com/vstu-sii/nedelnyy-daydzhest-mobilnogo-geyminga-wthe/actions/workflows/ci.yml)
 ## Что это
 
 Проект еженедельного дайджеста новостей и событий мобильного гейминга.
