@@ -12,17 +12,17 @@
 ## Кандидаты
 
 **Облако (США/Китай):**
-- Gemini 3.1 Pro: $2.00 / $12.00 за 1M токенов
-- GPT-5.4: $2.50 / $15.00
-- Claude Sonnet 5: $2.00 / $10.00
+- Gemini 3.1 Pro: $2.00 / $12.00 за 1M токенов — [Google API Pricing](https://benchlm.ai/google/api-pricing)
+- GPT-5.4: $2.50 / $15.00 — [OpenAI Pricing](https://openai.com/api/pricing/)
+- Claude Sonnet 5: $2.00 / $10.00 — [Anthropic](https://www.anthropic.com/news/claude-sonnet-5)
 
 **Российские:**
-- GigaChat Pro: 0.50 руб. за 1K токенов (~2000 руб. за 1M)
-- YandexGPT Pro 5.1: 0.80 руб. за 1K токенов
-- T-lite-it-2.1 (Т-Банк, Apache 2.0): open-weight, бесплатно
+- GigaChat Pro: 0.50 руб. за 1K токенов — [3DNews](https://3dnews.ru/1147409/sber-i-yandeks-v-razi-snizili-tseni-na-iitokeni-no-zarubegniy-ii-vsyo-ravno-deshevle)
+- YandexGPT Pro 5.1: 0.80 руб. за 1K токенов — [RB.RU](https://rb.ru/news/sber-i-yandeks-snizili-stoimost-ii-generacij-gigachat-podeshevel-na-67-yandexgpt-pro-na-33/)
+- T-lite-it-2.1 (Т-Банк, Apache 2.0): open-weight, бесплатно — [HuggingFace](https://huggingface.co/t-tech/T-lite-it-2.1)
 
 **Локальные (open-source):**
-- Cotype-Nano (МТС): $0.04 / $0.08
+- Cotype-Nano (МТС): $0.04 / $0.08 — [Featherless.ai](https://featherless.ai/models/MTSAIR/Cotype-Nano)
 
 ## Расчёт бюджета
 
@@ -49,4 +49,10 @@
 
 ## Источники
 
-Цены взяты из открытых публикаций и требуют верификации на официальных страницах провайдеров: Google Cloud, OpenAI, Anthropic, МТС Cotype, Т-Банк T-lite, GigaChat, YandexGPT.
+- Google API Pricing: https://benchlm.ai/google/api-pricing
+- OpenAI Pricing: https://openai.com/api/pricing/
+- Anthropic Claude Sonnet 5: https://www.anthropic.com/news/claude-sonnet-5
+- Featherless.ai Cotype-Nano: https://featherless.ai/models/MTSAIR/Cotype-Nano
+- HuggingFace T-lite-it-2.1: https://huggingface.co/t-tech/T-lite-it-2.1
+- 3DNews (GigaChat): https://3dnews.ru/1147409/sber-i-yandeks-v-razi-snizili-tseni-na-iitokeni-no-zarubegniy-ii-vsyo-ravno-deshevle
+- RB.RU (YandexGPT): https://rb.ru/news/sber-i-yandeks-snizili-stoimost-ii-generacij-gigachat-podeshevel-na-67-yandexgpt-pro-na-33/
