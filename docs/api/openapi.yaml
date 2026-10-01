@@ -1,0 +1,363 @@
+openapi: 3.0.3
+info:
+  title: AI Pipeline API — Mobile Gaming Digest
+  description: |
+    Контракт AI-эндпоинтов для автоматизации дайджеста мобильного гейминга.
+    Определяет, как Delivery вызывает AI-пайплайн и что получает на выходе.
+
+    Пайплайн: сбор → суммаризация → классификация → similarity → валидация → сборка.
+    Архитектура: docs/ai-pipeline.md
+    Выбор моделей: docs/model-candidates.md
+  version: 0.1.0
+  contact:
+    name: AI Engineer
+    url: https://github.com/vstu-project/nedelnyy-daydzhest-mobilnogo-geyminga-wthe
+
+servers:
+  - url: https://api.digest.local/v1
+    description: Локальное dev-окружение
+  - url: https://api.digest.staging/v1
+    description: Staging
+
+tags:
+  - name: digest
+    description: Операции с дайджестом
+  - name: health
+    description: Проверка состояния пайплайна
+
+paths:
+  /digest/generate:
+    post:
+      tags:
+        - digest
+      summary: Сгенерировать дайджест за период
+      description: |
+        Запускает полный пайплайн: сбор данных из SensorTower/AppMagic,
+        суммаризация нарратива (Gemini 3.1 Pro), классификация категорий
+        (Cotype-Nano), поиск похожих проектов, валидация цифр, сборка карточек.
+      operationId: generateDigest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DigestRequest'
+            examples:
+              weekly:
+                summary: Еженедельный дайджест
+                value:
+                  period: "2026-W40"
+                  top_n: 10
+                  categories: ["green", "yellow", "red", "turquoise"]
+                  language: "ru"
+      responses:
+        '200':
+          description: Дайджест успешно сгенерирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigestResponse'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Валидация цифр не пройдена (контроль К3)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '503':
+          description: SensorTower API недоступен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /digest/{digest_id}:
+    get:
+      tags:
+        - digest
+      summary: Получить дайджест по ID
+      operationId: getDigest
+      parameters:
+        - name: digest_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "dg-2026-10-01-001"
+      responses:
+        '200':
+          description: Дайджест найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigestResponse'
+        '404':
+          description: Дайджест не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /digest/{digest_id}/cards:
+    get:
+      tags:
+        - digest
+      summary: Получить карточки дайджеста
+      description: Возвращает структурированные карточки игр для рендеринга Delivery.
+      operationId: getDigestCards
+      parameters:
+        - name: digest_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Карточки
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameCard'
+
+  /health:
+    get:
+      tags:
+        - health
+      summary: Проверка состояния пайплайна
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Все компоненты доступны
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+
+components:
+  schemas:
+
+    DigestRequest:
+      type: object
+      required:
+        - period
+      properties:
+        period:
+          type: string
+          description: Период в формате ISO week или YYYY-MM
+          example: "2026-W40"
+        top_n:
+          type: integer
+          default: 10
+          minimum: 1
+          maximum: 50
+        categories:
+          type: array
+          items:
+            type: string
+            enum: [green, yellow, red, turquoise]
+        language:
+          type: string
+          enum: [ru, en]
+          default: ru
+
+    DigestResponse:
+      type: object
+      required:
+        - digest_id
+        - period
+        - cards
+        - meta
+      properties:
+        digest_id:
+          type: string
+          example: "dg-2026-10-01-001"
+        period:
+          type: string
+          example: "2026-W40"
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/GameCard'
+        meta:
+          $ref: '#/components/schemas/DigestMeta'
+
+    GameCard:
+      type: object
+      required:
+        - game_id
+        - name
+        - developer
+        - platforms
+        - release_date
+        - narrative
+        - category
+        - metrics
+      properties:
+        game_id:
+          type: string
+          example: "com.example.game"
+        name:
+          type: string
+          example: "Example Game"
+        developer:
+          type: string
+          example: "Example Studio"
+        platforms:
+          type: array
+          items:
+            type: string
+            enum: [ios, android]
+        release_date:
+          type: string
+          format: date
+          example: "2025-11-12"
+        narrative:
+          type: string
+          description: Сгенерированное описание нарратива игры (500 токенов, шаг 2 пайплайна)
+          example: "Гибридный roguelike с элементами base-building..."
+        category:
+          type: string
+          enum: [green, yellow, red, turquoise]
+          description: Классификация (шаг 3 пайплайна)
+        similar_projects:
+          type: array
+          description: Похожие проекты для бирюзовой категории (шаг 4 пайплайна)
+          items:
+            type: string
+        metrics:
+          $ref: '#/components/schemas/GameMetrics'
+        validation:
+          $ref: '#/components/schemas/ValidationStatus'
+
+    GameMetrics:
+      type: object
+      required:
+        - gross_usd
+        - installs
+      properties:
+        gross_usd:
+          type: number
+          description: Выручка за период, USD
+          example: 1250000.00
+        installs:
+          type: integer
+          example: 850000
+        geo_breakdown:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Разбивка установок по странам (ISO-код → число)
+          example:
+            US: 250000
+            JP: 180000
+            DE: 95000
+
+    ValidationStatus:
+      type: object
+      required:
+        - passed
+      properties:
+        passed:
+          type: boolean
+        checks:
+          type: array
+          items:
+            type: object
+            properties:
+              check_id:
+                type: string
+                enum: [K1, K2, K3, K4]
+              passed:
+                type: boolean
+              note:
+                type: string
+
+    DigestMeta:
+      type: object
+      required:
+        - request_id
+        - latency_ms
+        - cost_usd
+        - models_used
+      properties:
+        request_id:
+          type: string
+        latency_ms:
+          type: integer
+          description: Общая длительность пайплайна в миллисекундах
+          example: 185000
+        cost_usd:
+          type: number
+          description: Стоимость прогона в USD
+          example: 0.100
+        models_used:
+          type: array
+          items:
+            type: string
+          example: ["gemini-3.1-pro", "cotype-nano"]
+        steps_latency:
+          type: object
+          additionalProperties:
+            type: integer
+          description: Latency по шагам пайплайна (мс)
+          example:
+            collect: 12000
+            summarize: 95000
+            classify: 35000
+            similarity: 8000
+            validate: 15000
+            render: 20000
+
+    Health:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, down]
+        components:
+          type: object
+          additionalProperties:
+            type: string
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "SENSORTOWER_UNAVAILABLE"
+        message:
+          type: string
+          example: "SensorTower API вернул 503"
+        request_id:
+          type: string
+
+    ValidationError:
+      type: object
+      required:
+        - code
+        - message
+        - failed_checks
+      properties:
+        code:
+          type: string
+          example: "VALIDATION_FAILED"
+        message:
+          type: string
+          example: "Цифры gross не совпали с источником"
+        failed_checks:
+          type: array
+          items:
+            type: string
+          example: ["K3"]
+        request_id:
+          type: string
