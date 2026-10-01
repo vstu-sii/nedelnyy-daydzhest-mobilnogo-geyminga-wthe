@@ -15,20 +15,20 @@
 
 LLM-суммаризация — для описания нарратива. Классификация категорий — через дешёвую модель. Similarity-поиск — для бирюзовой категории через эмбеддинги.
 
-Кандидаты:
+**Кандидаты:**
 
 Для суммаризации:
-- Gemini 3.1 Pro: $2.00 / $12.00 за 1M токенов
-- GPT-5.4: $2.50 / $15.00
-- Claude Sonnet 5: $2.00 / $10.00
+- Gemini 3.1 Pro: $2.00 / $12.00 за 1M токенов — [Google API Pricing](https://benchlm.ai/google/api-pricing)
+- GPT-5.4: $2.50 / $15.00 — [OpenAI Pricing](https://openai.com/api/pricing/)
+- Claude Sonnet 5: $2.00 / $10.00 — [Anthropic](https://www.anthropic.com/news/claude-sonnet-5)
 
 Для классификации:
-- Cotype-Nano (МТС, open-source): $0.04 / $0.08
+- Cotype-Nano (МТС, open-source): $0.04 / $0.08 — [Featherless.ai](https://featherless.ai/models/MTSAIR/Cotype-Nano)
 
 Для русского языка:
-- T-lite-it-2.1 (Т-Банк, Apache 2.0): open-weight, бесплатно
-- GigaChat Pro: 0.50 руб. за 1K токенов
-- YandexGPT Pro 5.1: 0.80 руб. за 1K токенов
+- T-lite-it-2.1 (Т-Банк, Apache 2.0): open-weight, бесплатно — [HuggingFace](https://huggingface.co/t-tech/T-lite-it-2.1)
+- GigaChat Pro: 0.50 руб. за 1K токенов — [3DNews](https://3dnews.ru/1147409/sber-i-yandeks-v-razi-snizili-tseni-na-iitokeni-no-zarubegniy-ii-vsyo-ravno-deshevle)
+- YandexGPT Pro 5.1: 0.80 руб. за 1K токенов — [RB.RU](https://rb.ru/news/sber-i-yandeks-snizili-stoimost-ii-generacij-gigachat-podeshevel-na-67-yandexgpt-pro-na-33/)
 
 ## 3. Узкий фокус: детали для выбора
 
@@ -36,12 +36,12 @@ LLM-суммаризация — для описания нарратива. К�
 
 Сравнение кандидатов:
 
-- Gemini 3.1 Pro — $2.00/$12.00 — русский да, tool-calling да
-- GPT-5.4 — $2.50/$15.00 — русский да, tool-calling да
-- Claude Sonnet 5 — $2.00/$10.00 — русский да, tool-calling да
-- GigaChat Pro — 0.50 руб./1K — русский нативно, tool-calling ограничено
-- YandexGPT Pro 5.1 — 0.80 руб./1K — русский нативно, tool-calling ограничено
-- T-lite-it-2.1 — open-weight — русский нативно, tool-calling да
+- Gemini 3.1 Pro — $2.00/$12.00 — русский да, tool-calling да — [Google API Pricing](https://benchlm.ai/google/api-pricing)
+- GPT-5.4 — $2.50/$15.00 — русский да, tool-calling да — [OpenAI Pricing](https://openai.com/api/pricing/)
+- Claude Sonnet 5 — $2.00/$10.00 — русский да, tool-calling да — [Anthropic](https://www.anthropic.com/news/claude-sonnet-5)
+- GigaChat Pro — 0.50 руб./1K — русский нативно, tool-calling поддерживается — [Sber Developers](https://developers.sber.ru/docs/ru/gigachat/guides/functions/overview)
+- YandexGPT Pro 5.1 — 0.80 руб./1K — русский нативно, tool-calling поддерживается — [Neurounit](https://neurounit.ai/blog/yandexgpt-chto-umeet-i-kak-primenyat/)
+- T-lite-it-2.1 — open-weight — русский нативно, tool-calling да — [HuggingFace](https://huggingface.co/t-tech/T-lite-it-2.1)
 
 Вывод: для суммаризации — Gemini 3.1 Pro или Claude Sonnet 5. Для русского — GigaChat Pro или T-lite-it-2.1. Для классификации — Cotype-Nano.
 
