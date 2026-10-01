@@ -23,6 +23,7 @@
 
 **Локальные (open-source):**
 - Cotype-Nano (МТС): $0.04 / $0.08 — [Featherless.ai](https://featherless.ai/models/MTSAIR/Cotype-Nano)
+- GLM-5.2 (MIT, open-weight): $1.40 / $4.40 за 1M токенов — [GLM-5.2 — vLLM Recipes](https://recipes.vllm.ai/zai-org/GLM-5.2?hardware=h200)
 
 ## Расчёт бюджета
 
@@ -36,7 +37,13 @@
 
 ## Что меняется при локальном хостинге
 
-Если модель держать локально: данные не уходят в облако, но нужно железо (GPU с достаточной VRAM), качество open-weight моделей ниже топовых облачных, latency зависит от вашего железа. Для дайджеста с 10 играми это избыточно — облако дешевле и проще. Источник оценки требований к железу: [HuggingFace — Model Memory Calculator](https://huggingface.co/spaces/hf-accelerate/model-memory-utility).
+Если модель держать локально: данные не уходят в облако, но нужно железо. Однако утверждение «качество open-weight ниже топовых облачных» в 2026 году уже неверно как общее правило.
+
+Mozilla в отчёте State of Open Source AI (сентябрь 2026) зафиксировала: разрыв между лучшими open-weight и закрытыми фронтирными моделями сократился до ~4.4 месяцев по методологии METR, а по Artificial Analysis Intelligence Index лучшая open-weight модель отстаёт от закрытого лидера всего на 3 балла — [Mozilla — State of Open Source AI](https://unwire.hk/2026/09/18/china-open-source-ai-models-narrow-gap-us-mozilla-report/column/).
+
+GLM-5.2 (open-weight, MIT) набрал 81.0 на Terminal-Bench 2.1 — первый open-weight результат выше 80% на этом бенчмарке. Разрыв с Claude Opus 4.7 — 1 балл, стоимость — менее 1/5 от цены конкурента. Цена GLM-5.2: $1.40/$4.40 за 1M токенов на официальном API Z.ai против $5.00/$25.00 у Claude Opus 4.8 — [GLM-5.2 — vLLM Recipes](https://recipes.vllm.ai/zai-org/GLM-5.2?hardware=h200), [Morph — GLM-5.2 Pricing](https://www.morphllm.com/glm-5-2).
+
+**Вывод «облако дешевле и проще» требует уточнения.** Облако проще — не нужна инфраструктура. Но дешевле — не всегда: при наличии GPU локальный GLM-5.2 может быть дешевле облачных моделей за тот же объём. Для дайджеста с 10 играми это требует отдельного расчёта, который не входит в скоуп Lab1.
 
 ## Риски бюджета
 
@@ -63,4 +70,6 @@
 - OpenAI GPT-4 Technical Report: https://arxiv.org/abs/2303.08774
 - SensorTower: https://sensortower.com/product/mobile-app-intelligence
 - AppMagic: https://appmagic.com
-- HuggingFace Model Memory Calculator: https://huggingface.co/spaces/hf-accelerate/model-memory-utility
+- GLM-5.2 Terminal-Bench 2.1 (81.0): https://recipes.vllm.ai/zai-org/GLM-5.2?hardware=h200
+- GLM-5.2 Pricing (Morph): https://www.morphllm.com/glm-5-2
+- Mozilla State of Open Source AI: https://unwire.hk/2026/09/18/china-open-source-ai-models-narrow-gap-us-mozilla-report/column/
