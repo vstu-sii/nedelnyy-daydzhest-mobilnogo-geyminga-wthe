@@ -2,16 +2,14 @@
 
 **Роль:** AI Engineer
 **Спринт:** Lab2 — Design
-**Дата:** 2026-10-01
-**Связанные документы:** [research.md](./research.md) (лаба 1), [model-candidates.md](./model-candidates.md)
+**Дата:** 2026-10-15
+**Связанные документы:** [research.md](./research.md), [model-candidates.md](./model-candidates.md)
 
 ---
 
 ## 1. Общая архитектура
 
 Пайплайн — агентная сборка из четырёх последовательных шагов. Прямые промпты не подходят, потому что задача требует оркестрации (сбор → суммаризация → классификация → сборка). RAG не подходит, потому что нет базы знаний — данные приходят из внешнего API.
-
-Обоснование выбора — в [research.md, раздел «Решение»](./research.md).
 
 ### Схема пайплайна (PlantUML)
 
@@ -23,159 +21,182 @@ skinparam componentStyle rectangle
 actor "Аналитик" as User
 participant "Оркестратор\n(агент)" as Orchestrator
 database "SensorTower /\nAppMagic API" as DataSource
-participant "Модель:\nGemini 3.1 Pro" as LLM
-participant "Модель:\nCotype-Nano" as Classifier
+participant "Gemini 3.1 Pro\n(суммаризация)" as LLM
+participant "Cotype-Nano\n(классификация)" as Classifier
 database "Векторная БД\n(Qdrant)" as VectorDB
-participant "Рендер\nкарточек" as Renderer
-participant "Валидатор\n(golden dataset)" as Validator
+participant "Валидатор" as Validator
+participant "Рендер" as Renderer
 
 User -> Orchestrator: Запрос на дайджест
 activate Orchestrator
 
 group Шаг 1. Сбор данных
-    Orchestrator -> DataSource: Запрос метрик (top-10 игр)
-    DataSource --> Orchestrator: gross, installs, geo, дата релиза, разработчик
-    note right of Orchestrator
-        Точка логирования Л1:
-        request_id, timestamp, список игр
-    end note
+    Orchestrator -> DataSource: Запрос метрик
+    alt API доступен
+        DataSource --> Orchestrator: gross, installs, geo
+    else API недоступен (503)
+        Orchestrator --> User: Ошибка: источник данных недоступен
+        note right: Эскалация: уведомить аналитика
+    end
 end
 
-group Шаг 2. Суммаризация нарратива
-    Orchestrator -> LLM: Промпт: стор + промо → описание игры
-    LLM --> Orchestrator: Текстовое описание (500 токенов)
-    note right of LLM
-        Границы контекста:
-        модель видит только стор
-        и промо-материалы.
-        Не видит внутренние данные студии.
-    end note
-    note right of Orchestrator
-        Точка контроля К1:
-        проверка на галлюцинации
-        (сверка имён и цифр)
-    end note
+group Шаг 2. Суммаризация
+    Orchestrator -> LLM: Промпт
+    LLM --> Orchestrator: Описание
+    note right of Orchestrator: Контроль К1: галлюцинации
+    alt К1 пройден
+        Orchestrator -> Orchestrator: Принять описание
+    else К1 не пройден
+        loop Retry до 2 раз
+            Orchestrator -> LLM: Повторный запрос
+            LLM --> Orchestrator: Новое описание
+        end
+        alt Retry не помог
+            Orchestrator --> User: Эскалация: ручная проверка
+        end
+    end
 end
 
-group Шаг 3. Классификация категорий
-    Orchestrator -> Classifier: Промпт: метрики + описание → категория
-    Classifier --> Orchestrator: Метка (зелёный/жёлтый/красный/бирюзовый)
-    note right of Orchestrator
-        Точка контроля К2:
-        нет ложных «зелёных»
-        по случайному всплеску
-    end note
+group Шаг 3. Классификация
+    Orchestrator -> Classifier: Промпт
+    Classifier --> Orchestrator: Категория
+    note right of Orchestrator: Контроль К2: ложные "зелёные"
+    alt К2 пройден
+        Orchestrator -> Orchestrator: Принять категорию
+    else К2 не пройден
+        Orchestrator -> Orchestrator: Понизить до "жёлтой"
+        note right: Пометка для ручной проверки
+    end
 end
 
-group Шаг 4. Similarity для бирюзовой категории
-    Orchestrator -> VectorDB: Поиск похожих проектов
-    VectorDB --> Orchestrator: Список похожих игр
+group Шаг 4-5. Similarity и валидация
+    Orchestrator -> VectorDB: Поиск похожих
+    VectorDB --> Orchestrator: Список
+    Orchestrator -> Validator: Проверка цифр
+    alt К3 пройден
+        Validator --> Orchestrator: OK
+    else К3 не пройден
+        Validator --> Orchestrator: Расхождение >5%
+        Orchestrator --> User: Блокировка публикации
+        note right: Эскалация: аналитик проверяет данные
+    end
 end
 
-group Шаг 5. Валидация и сборка
-    Orchestrator -> Validator: Проверка цифр против источника
-    Validator --> Orchestrator: OK / расхождения
-    note right of Validator
-        Точка контроля К3:
-        gross/installs сверяются
-        с первоисточником
-    end note
-    Orchestrator -> Renderer: Сборка карточек и белой доски
-    Renderer --> Orchestrator: Изображение дайджеста
-end
-
+Orchestrator -> Renderer: Сборка карточек
+Renderer --> Orchestrator: Изображение
 Orchestrator --> User: Готовый дайджест
 deactivate Orchestrator
 
 note over Orchestrator
-    Точка логирования Л2 (финал):
-    request_id, latency по шагам,
-    стоимость токенов, статус
+    Логирование Л1-Л5 на всех шагах
 end note
-
 @enduml
 ```
 
-**Как отрендерить схему:** скопируйте блок между ```plantuml и ``` и вставьте на [plantuml.com/plantuml](https://www.plantuml.com/plantuml/uml/). GitHub умеет рендерить PlantUML, если в репозитории настроен плагин — если нет, схема останется текстом, и это нормально.
+Схему можно отрендерить на [plantuml.com/plantuml](https://www.plantuml.com/plantuml/uml/).
 
 ---
 
 ## 2. Точки контроля качества
 
-| ID | Где | Что проверяем | Что делаем при провале |
+| ID | Где | Что проверяем | При провале |
 |---|---|---|---|
-| **К1** | После суммаризации (шаг 2) | Галлюцинации: не путает ли модель игры с похожими названиями, нет ли выдуманных цифр | Отклонить описание, повторить запрос с тем же промптом (retry), при повторном провале — отправить на ручную проверку |
-| **К2** | После классификации (шаг 3) | Ложные «зелёные» по случайному всплеску. Сверка категории с историческими данными за 4 недели | Понизить категорию до «жёлтой», пометить для ручной проверки |
-| **К3** | Перед публикацией (шаг 5) | Соответствие gross/installs первоисточнику (SensorTower API) | Блокировать публикацию, перезапросить данные, при расхождении >5% — эскалация аналитику |
-| **К4** | Финал | Соответствие структуры карточки шаблону (название, платформы, дата, разработчик, описание, график) | Отклонить карточку, пересобрать |
-
-Контроль качества опирается на golden dataset (см. [quality/golden-dataset-plan.md](./quality/golden-dataset-plan.md) — из зоны Quality & Safety).
+| К1 | После суммаризации | Галлюцинации, путаница с похожими играми | Retry до 2 раз, затем эскалация аналитику |
+| К2 | После классификации | Ложные «зелёные» на случайных всплесках | Понизить категорию, пометить для ручной проверки |
+| К3 | Перед публикацией | Соответствие gross/installs первоисточнику | Блокировка публикации, эскалация при расхождении >5% |
+| К4 | Финал | Соответствие структуры карточки шаблону | Отклонить, пересобрать |
 
 ---
 
 ## 3. Точки логирования
 
-| ID | Когда | Что пишем | Зачем |
-|---|---|---|---|
-| **Л1** | Начало пайплайна | request_id, timestamp, список игр, источник данных | Воспроизводимость прогона |
-| **Л2** | Финал пайплайна | request_id, latency по шагам, стоимость токенов, статус (success/fail) | Аудит стоимости и производительности |
-| **Л3** | На каждом вызове модели | модель, input_tokens, output_tokens, стоимость, latency | Расчёт бюджета, сравнение с планом |
-| **Л4** | При провале контроля качества | ID контроля (К1–К4), причина, что было в input, что вернула модель | Разбор инцидентов |
-| **Л5** | При retry | номер попытки, причина повтора, результат | Понимание, где пайплайн нестабилен |
+| ID | Когда | Что пишем |
+|---|---|---|
+| Л1 | Начало пайплайна | request_id, timestamp, список игр, источник данных |
+| Л2 | Финал пайплайна | request_id, latency по шагам, стоимость, статус |
+| Л3 | Каждый вызов модели | модель, input/output tokens, стоимость, latency |
+| Л4 | Провал контроля качества | ID контроля (К1–К4), причина, input/output |
+| Л5 | Retry | номер попытки, причина, результат |
 
-**Формат логов:** JSON-строки, по одной на событие. Пример для Л3:
-
-```json
-{
-  "request_id": "dg-2026-10-01-001",
-  "step": "summarization",
-  "model": "gemini-3.1-pro",
-  "input_tokens": 2000,
-  "output_tokens": 500,
-  "cost_usd": 0.010,
-  "latency_ms": 2400,
-  "timestamp": "2026-10-01T10:15:32Z"
-}
-```
+Формат — JSON-строки, по одной на событие.
 
 ---
 
-## 4. Границы контекста: что модель видит и чего не видит
+## 4. Границы контекста
 
-### Что модель видит (вход в промпт)
+### Что модель видит
 
-**Для суммаризации (шаг 2):**
-- Название игры, разработчик, дата релиза, платформы
-- Описание из стора (App Store / Google Play)
-- Промо-материалы (трейлер, скриншоты, теги)
-- Жанр и механики (из стора)
-- Метрики gross/installs (для контекста, не для пересказа)
+**Суммаризация:** название, разработчик, дата релиза, платформы, описание из стора, промо-материалы, жанр, метрики gross/installs.
 
-**Для классификации (шаг 3):**
-- Метрики gross/installs и их динамика за 4 недели
-- Geo-разбивка установок
-- Категория из предыдущего дайджеста (для отслеживания переходов)
-- Описание нарратива (из шага 2)
+**Классификация:** метрики за 4 недели, geo-разбивка, категория из предыдущего дайджеста, описание нарратива из шага 2.
 
 ### Что модель НЕ видит
 
-- **Внутренние данные студии:** метрики собственных продуктов, юнит-экономика, retention, LTV — они не нужны для описания чужих игр и создают риск утечки.
-- **Персональные данные:** имена аналитиков, комментарии из внутренних чатов, любые PII.
-- **Чужие дайджесты и внутренние документы конкурентов** — чтобы не было плагиата и чтобы модель не «додумывала» на основе чужих выводов.
-- **Сырые логи и метаданные API** — модели передаётся только очищенный вход, без токенов доступа, URL с параметрами, заголовков.
-- **Исторические дайджесты за прошлые периоды** — они используются в К2 для валидации, но не передаются модели, чтобы не смещать её выводы.
-
-### Почему это важно
-
-Границы контекста определяют:
-1. **Стоимость** — чем больше вход, тем дороже токены (вход в 2000 токенов на игру даёт $0.100 за дайджест по расчёту).
-2. **Качество** — лишний контекст может сбить модель (например, если передать данные по конкурентам, модель может их перепутать).
-3. **Безопасность** — PII и внутренние данные не должны покидать студию, даже в промпт.
+- Внутренние данные студии (метрики своих продуктов, юнит-экономика).
+- Персональные данные (имена аналитиков, комментарии из чатов).
+- Чужие дайджесты и внутренние документы конкурентов.
+- Сырые логи и метаданные API (токены, URL с параметрами).
+- Исторические дайджесты за прошлые периоды.
 
 ---
 
 ## 5. Что дальше
 
-- **ADR выбора моделей** — финальный выбор из кандидатов лабы 1 + план деградации → [model-candidates.md, раздел «Решение»](./model-candidates.md).
-- **Спайки** — проверка самых рискованных допущений этого пайплайна (галлюцинации, стабильность классификации) → [spikes/lab2.md](./spikes/lab2.md).
-- **Контракт AI-эндпоинтов** — OpenAPI-спецификация для интеграции с Delivery → [api/openapi.yaml](./api/openapi.yaml).
+- **ADR выбора моделей** — [model-candidates.md, раздел «Решение»](./model-candidates.md).
+- **Спайки** — [spikes/lab2.md](./spikes/lab2.md).
+- **Контракт API** — [api/openapi.yaml](./api/openapi.yaml).
+
+---
+
+## 6. ERD: хранилище дайджестов
+
+Схема описывает, где хранятся данные для `GET /digest/{digest_id}`.
+
+```mermaid
+erDiagram
+    DIGEST ||--o{ GAME_CARD : contains
+    DIGEST ||--|| DIGEST_META : has
+    GAME_CARD ||--|| GAME_METRICS : has
+    GAME_CARD ||--o| VALIDATION_STATUS : has
+    GAME_CARD ||--o{ SIMILAR_PROJECT : has
+
+    DIGEST {
+        string digest_id PK
+        string period
+        timestamp created_at
+        string status
+    }
+    GAME_CARD {
+        string game_id PK
+        string digest_id FK
+        string name
+        string developer
+        string narrative
+        string category
+        date release_date
+    }
+    GAME_METRICS {
+        string game_id PK
+        float gross_usd
+        int installs
+        json geo_breakdown
+    }
+    VALIDATION_STATUS {
+        string game_id PK
+        boolean passed
+        json checks
+    }
+    SIMILAR_PROJECT {
+        string game_id FK
+        string similar_game_id FK
+    }
+    DIGEST_META {
+        string digest_id PK
+        int latency_ms
+        float cost_usd
+        json models_used
+        json steps_latency
+    }
+```
+
+Таблицы соответствуют схемам из `api/openapi.yaml`.
