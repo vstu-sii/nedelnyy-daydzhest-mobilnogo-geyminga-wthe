@@ -1,0 +1,30 @@
+@startuml C4_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title C4 Context — Недельный дайджест мобильного гейминга
+
+Person(reader, "Читатель", "Читает новости и события мобильного гейминга")
+
+System(digest, "Недельный дайджест мобильного гейминга", "Планируемый продукт для публикации еженедельных новостей и событий")
+
+Rel(reader, digest, "Читает дайджест")
+
+SHOW_LEGEND()
+@enduml
+
+@startuml C4_Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title C4 Container — Недельный дайджест мобильного гейминга
+
+Person(reader, "Читатель", "Читает новости и события")
+
+System_Boundary(digest, "Недельный дайджест мобильного гейминга") {
+    Container(webapp, "Веб-приложение", "HTML, CSS, JavaScript", "Планируемый интерфейс дайджеста; исходный каркас находится в src/index.html")
+}
+
+Rel(reader, webapp, "Открывает и читает", "HTTPS — планируемое развёртывание")
+
+SHOW_LEGEND()
+@enduml
+```
