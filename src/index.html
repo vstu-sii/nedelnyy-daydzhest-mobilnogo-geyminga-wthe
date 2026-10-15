@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Еженедельный дайджест новостей, обновлений и событий мобильного гейминга.">
+    <title>Недельный дайджест мобильного гейминга</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <a class="logo" href="#home" aria-label="На главную">
+            <span class="logo-icon">И</span>
+            <span class="brand-name">НЕДЕЛЬНЫЙ ДАЙДЖЕСТ<span class="accent"> МОБИЛЬНОГО ГЕЙМИНГА</span></span>
+        </a>
+
+        <nav class="nav" aria-label="Главная навигация">
+            <a href="#home">Главная</a>
+            <a href="#news">Новости</a>
+            <a href="#events">События</a>
+        </nav>
+
+        <a class="header-button" href="#digest">Дайджест недели ↗</a>
+    </header>
+
+    <main class="container" id="home">
+        <section class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow"><span class="status-dot"></span> ТВОЯ НЕДЕЛЯ В ИГРАХ</p>
+                <h1>Мобильный гейминг.<br><span class="accent">Без лишнего шума.</span></h1>
+                <p class="hero-description">
+                    Самые интересные новости, громкие обновления
+                    и события мобильных игр — в одном месте.
+                </p>
+                <a class="primary-button" href="#news">Исследовать новости <span>→</span></a>
+
+                <div class="hero-stats">
+                    <div><strong>01</strong><span>Главный дайджест</span></div>
+                    <div><strong>03</strong><span>Раздела</span></div>
+                    <div><strong>∞</strong><span>Игровых миров</span></div>
+                </div>
+            </div>
+
+            <div class="hero-art" aria-label="Абстрактная иллюстрация игрового мира" role="img">
+                <div class="art-orbit orbit-one"></div>
+                <div class="art-orbit orbit-two"></div>
+                <div class="art-core">GAME<br><strong>WEEK</strong></div>
+                <span class="art-tag tag-top">MOBILE GAMING</span>
+                <span class="art-tag tag-bottom">WEEKLY DIGEST</span>
+                <span class="art-cross cross-one">✳</span>
+                <span class="art-cross cross-two">✦</span>
+            </div>
+        </section>
+
+        <section class="digest-strip" id="digest">
+            <div>
+                <span class="strip-label">В ФОКУСЕ НЕДЕЛИ</span>
+                <h2>Что происходит в мире мобильных игр?</h2>
+            </div>
+            <p>Новости · Релизы · Игровые события</p>
+        </section>
+
+        <section class="section" id="news">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">СВЕЖИЕ ОБНОВЛЕНИЯ</p>
+                    <h2>Главное за неделю<span class="accent">.</span></h2>
+                </div>
+                <span class="section-counter">01 — 03</span>
+            </div>
+
+            <div class="filters" role="group" aria-label="Фильтр новостей">
+                <button class="filter active" data-filter="all" aria-pressed="true">Все материалы</button>
+                <button class="filter" data-filter="news" aria-pressed="false">Новости</button>
+                <button class="filter" data-filter="updates" aria-pressed="false">Обновления</button>
+                <button class="filter" data-filter="releases" aria-pressed="false">Релизы</button>
+            </div>
+
+            <div class="news-grid">
+                <article class="news-card" data-category="news">
+                    <div class="card-art art-space">
+                        <span class="art-symbol">✳</span>
+                        <span class="card-number">01</span>
+                        <span class="art-caption">NEXT FRONTIER</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="category">НОВОСТИ</span>
+                            <span>14 ОКТ</span>
+                        </div>
+                        <h3>Новая эра мобильных игровых миров</h3>
+                        <p>Разбираемся в трендах, которые формируют будущее мобильного гейминга.</p>
+                        <button class="read-more" data-story="0">Читать материал <span>↗</span></button>
+                    </div>
+                </article>
+
+                <article class="news-card" data-category="updates">
+                    <div class="card-art art-nature">
+                        <span class="art-symbol">❋</span>
+                        <span class="card-number">02</span>
+                        <span class="art-caption">FRESH CONTENT</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="category category-violet">ОБНОВЛЕНИЯ</span>
+                            <span>17 ОКТ</span>
+                        </div>
+                        <h3>Обновления, ради которых стоит вернуться</h3>
+                        <p>Новые режимы, игровые механики и сезонный контент в популярных жанрах.</p>
+                        <button class="read-more" data-story="1">Читать материал <span>↗</span></button>
+                    </div>
+                </article>
+
+                <article class="news-card" data-category="releases">
+                    <div class="card-art art-racing">
+                        <span class="art-symbol">⚡</span>
+                        <span class="card-number">03</span>
+                        <span class="art-caption">READY TO PLAY</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-meta">
+                            <span class="category category-orange">РЕЛИЗЫ</span>
+                            <span>20 ОКТ</span>
+                        </div>
+                        <h3>Что попробовать на этой неделе</h3>
+                        <p>Подборка игровых новинок для коротких сессий и долгих приключений.</p>
+                        <button class="read-more" data-story="2">Читать материал <span>↗</span></button>
+                    </div>
+                </article>
+            </div>
+
+            <p class="demo-note">Демонстрационные материалы для прототипа — не реальные новости.</p>
+        </section>
+
+        <section class="events-section" id="events">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">ДОБАВЬ В КАЛЕНДАРЬ</p>
+                    <h2>События недели<span class="accent">.</span></h2>
+                </div>
+                <span class="section-counter">03 СОБЫТИЯ</span>
+            </div>
+
+            <div class="event-list">
+                <article class="event">
+                    <div class="event-date">
+                        <strong>16</strong>
+                        <span>ОКТ</span>
+                    </div>
+                    <div class="event-info">
+                        <h3>Старт нового сезона</h3>
+                        <p>Сезонные задания и новые награды</p>
+                    </div>
+                    <span class="event-type">СЕЗОН</span>
+                </article>
+
+                <article class="event">
+                    <div class="event-date">
+                        <strong>18</strong>
+                        <span>ОКТ</span>
+                    </div>
+                    <div class="event-info">
+                        <h3>Новый игровой режим</h3>
+                        <p>Время проверить свои навыки</p>
+                    </div>
+                    <span class="event-type violet">РЕЖИМ</span>
+                </article>
+
+                <article class="event">
+                    <div class="event-date">
+                        <strong>20</strong>
+                        <span>ОКТ</span>
+                    </div>
+                    <div class="event-info">
+                        <h3>Финал игрового турнира</h3>
+                        <p>Решающие матчи и итоги соревнования</p>
+                    </div>
+                    <span class="event-type orange">ТУРНИР</span>
+                </article>
+            </div>
+
+            <p class="demo-note">Даты и названия событий приведены для демонстрации интерфейса.</p>
+        </section>
+
+        <section class="subscribe">
+            <div>
+                <p class="eyebrow">БУДЬ В ИГРЕ</p>
+                <h2>Твой следующий уровень<br>начинается здесь.</h2>
+                <p>Заглядывай за новыми подборками и игровыми открытиями.</p>
+            </div>
+            <a class="primary-button" href="#home">Наверх ↑</a>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <a class="logo" href="#home" aria-label="На главную">
+            <span class="logo-icon">И</span>
+            <span class="brand-name">НЕДЕЛЬНЫЙ ДАЙДЖЕСТ<span class="accent"> МОБИЛЬНОГО ГЕЙМИНГА</span></span>
+        </a>
+        <p>Учебный прототип · Недельный дайджест мобильного гейминга</p>
+        <span>© 2026</span>
+    </footer>
+
+    <dialog id="story-dialog" class="story-dialog">
+        <button class="dialog-close" aria-label="Закрыть">×</button>
+        <p class="eyebrow" id="story-category">МАТЕРИАЛ НЕДЕЛИ</p>
+        <h2 id="story-title">Заголовок материала</h2>
+        <p id="story-description"></p>
+        <p class="demo-note">Это демонстрационный текст. Перед публикацией его следует заменить проверенной информацией.</p>
+    </dialog>
+</body>
+</html>

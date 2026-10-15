@@ -1,0 +1,66 @@
+@startuml
+title ERD — Недельный дайджест мобильного гейминга
+
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+
+entity "games" as games {
+  * id : INTEGER <<PK>>
+  --
+  * name : TEXT
+  platform : TEXT
+  created_at : TEXT
+}
+
+entity "categories" as categories {
+  * id : INTEGER <<PK>>
+  --
+  * name : TEXT <<UNIQUE>>
+  slug : TEXT <<UNIQUE>>
+}
+
+entity "sources" as sources {
+  * id : INTEGER <<PK>>
+  --
+  * name : TEXT
+  * url : TEXT
+  created_at : TEXT
+}
+
+entity "articles" as articles {
+  * id : INTEGER <<PK>>
+  --
+  * title : TEXT
+  * summary : TEXT
+  content : TEXT
+  url : TEXT <<UNIQUE>>
+  published_at : TEXT
+  status : TEXT
+  source_id : INTEGER <<FK>>
+  created_at : TEXT
+  updated_at : TEXT
+}
+
+entity "article_categories" as article_categories {
+  * article_id : INTEGER <<PK, FK>>
+  * category_id : INTEGER <<PK, FK>>
+}
+
+entity "events" as events {
+  * id : INTEGER <<PK>>
+  --
+  * title : TEXT
+  description : TEXT
+  starts_at : TEXT
+  ends_at : TEXT
+  game_id : INTEGER <<FK>>
+  created_at : TEXT
+}
+
+sources ||--o{ articles : publishes
+articles ||--o{ article_categories : classified
+categories ||--o{ article_categories : contains
+games |o--o{ events : has
+
+@enduml
