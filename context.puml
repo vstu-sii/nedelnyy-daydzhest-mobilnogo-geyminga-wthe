@@ -1,0 +1,13 @@
+@startuml C4_Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title C4 Context - Weekly Mobile Gaming Digest
+
+Person(reader, "Reader", "Reads mobile gaming news and events")
+
+System(digest, "Weekly Mobile Gaming Digest", "Planned product for publishing weekly mobile gaming news")
+
+Rel(reader, digest, "Reads the digest")
+
+SHOW_LEGEND()
+@enduml
