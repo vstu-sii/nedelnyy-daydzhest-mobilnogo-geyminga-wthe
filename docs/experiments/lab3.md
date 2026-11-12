@@ -14,7 +14,7 @@ Baseline-модель (`ml/models/baseline.py`), которая делает д�
 
 ## 2. Цифры baseline
 
-| game_id | narrative (фрагмент) | category | latency_summarize | latency_classify | total_latency | input_tokens |
+| game_id | narrative (фрагмент) | category | latency_summarize | latency_classify | total_latency | total_tokens |
 |---|---|---|---|---|---|---|
 | nr_002 | Это динамичный командный шутер 3 на 3... | green | 5.96 с | 5.18 с | 11.14 с | 14 |
 | tt_001 | В игре Merge вы получаете задание... | yellow | 4.68 с | 6.08 с | 10.76 с | 11 |
