@@ -67,6 +67,27 @@ def main():
     print(f"Валидный JSON: {valid_json_pct:.1f}%")
     print(f"Наличие источников: {sources_pct:.1f}%")
     print(f"Средняя оценка судьи: {avg_judge:.2f} / 5")
+        # --- QUALITY GATES (Пороги качества) ---
+    print("\n--- ПРОВЕРКА ПОРОГОВ (QUALITY GATES) ---")
+    gate_passed = True
+    
+    if valid_json_pct < 100.0:
+        print(f"❌ FAIL: Валидный JSON {valid_json_pct:.1f}% (требуется 100%)")
+        gate_passed = False
+    
+    if sources_pct < 95.0:
+        print(f"❌ FAIL: Наличие источников {sources_pct:.1f}% (требуется 95%)")
+        gate_passed = False
+        
+    if avg_judge < 4.0:
+        print(f"❌ FAIL: Оценка судьи {avg_judge:.2f} (требуется 4.0)")
+        gate_passed = False
+
+    if not gate_passed:
+        import sys
+        sys.exit(1) # Этот код ошибки остановит CI и покрасит PR в красный
+    else:
+        print("✅ PASS: Все пороги пройдены. Merge разрешен.")
 
 if __name__ == "__main__":
     main()
