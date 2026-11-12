@@ -6,6 +6,8 @@ from pydantic import BaseModel, Field
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 from ml.tracing.config import setup_tracing, log_to_dashboard
+# Импортируем наши новые промпты
+from ml.prompts_v2.prompts import prompt_summarize_v2, prompt_classify_v2
 
 setup_tracing()
 
@@ -59,7 +61,6 @@ def _call_llm(model: str, prompt: str, step_name: str) -> str:
 
 class BaselineModel:
     def __init__(self):
-        # Кэш для хранения ответов (экономия токенов из ml-cost.md)
         self._cache = {}
 
     def summarize(self, game_id: str, store_text: str) -> SummaryOutput:
@@ -68,7 +69,8 @@ class BaselineModel:
             print(f"[CACHE HIT] summarize для {game_id}")
             return self._cache[cache_key]
 
-        prompt = f'Опиши игру в 3-4 предложениях. Описание: {store_text}. Верни JSON: {{"game_id": "{game_id}", "narrative": "текст"}}'
+        # ИСПОЛЬЗУЕМ ИМПОРТИРОВАННЫЙ ПРОМПТ V2
+        prompt = prompt_summarize_v2(game_id, store_text)
         try:
             raw = _call_llm(MODEL_SUMMARIZE, prompt, "summarize")
             result = SummaryOutput(**json.loads(raw))
@@ -83,7 +85,8 @@ class BaselineModel:
             print(f"[CACHE HIT] classify для {game_id}")
             return self._cache[cache_key]
 
-        prompt = f'Определи категорию (green, yellow, red, turquoise) по метрикам: {metrics_4w}. Верни JSON: {{"game_id": "{game_id}", "category": "green"}}'
+        # ИСПОЛЬЗУЕМ ИМПОРТИРОВАННЫЙ ПРОМПТ V2
+        prompt = prompt_classify_v2(game_id, metrics_4w)
         try:
             raw = _call_llm(MODEL_CLASSIFY, prompt, "classify")
             data = json.loads(raw)
