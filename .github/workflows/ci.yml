@@ -57,7 +57,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./backend
-          file: ./Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/gaming-digest-api:${{ github.ref_name == 'main' && 'latest' || 'lab4-test' }}
