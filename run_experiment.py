@@ -4,8 +4,12 @@ import time
 import pandas as pd
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
+# Импортируем наши функции трассировки
+from ml.tracing.config import setup_tracing, log_to_dashboard
 
-# Проверяем наличие ключа
+# Инициализируем логгер
+setup_tracing()
+
 API_KEY = os.environ.get("OPENROUTER_API_KEY")
 IS_MOCK = not API_KEY or API_KEY == "sk-placeholder"
 
@@ -18,8 +22,10 @@ MODEL = "openrouter/free"
 @retry(stop=stop_after_attempt(2), wait=wait_exponential(multiplier=1, min=2, max=5))
 def call_llm(prompt: str, step_name: str):
     if IS_MOCK:
-        # Если ключа нет, возвращаем заглушку, чтобы робот мог проверить структуру
-        return {"narrative": "Симуляция нарратива (нет ключа)", "category": "green"}, 2.5, 15, 20, 35
+        # Заглушка для робота, если нет ключа
+        trace = {"step": step_name, "status": "mock", "prompt": prompt, "response": "mock", "total_tokens": 10}
+        log_to_dashboard(trace)
+        return {"narrative": "Симуляция нарратива", "category": "green"}, 2.5, 15, 20, 35
 
     start = time.time()
     try:
@@ -31,10 +37,11 @@ def call_llm(prompt: str, step_name: str):
         )
         latency = time.time() - start
         usage = response.usage
+        
         trace = {
             "step": step_name,
             "model": MODEL,
-            "latency": round(latency, 2),
+            "latency_s": round(latency, 2),
             "prompt": prompt,
             "response": response.choices[0].message.content,
             "prompt_tokens": usage.prompt_tokens if usage else 0,
@@ -42,10 +49,12 @@ def call_llm(prompt: str, step_name: str):
             "total_tokens": usage.total_tokens if usage else 0,
             "status": "success"
         }
-        print(json.dumps(trace, ensure_ascii=False))
+        # Вызываем трассировку
+        log_to_dashboard(trace) 
         return response.choices[0].message.content, latency, usage.prompt_tokens, usage.completion_tokens, usage.total_tokens
     except Exception as e:
-        print(f'{{"step": "{step_name}", "status": "error: {e}"}}')
+        latency = round(time.time() - start, 2)
+        log_to_dashboard({"step": step_name, "status": f"error: {e}", "latency_s": latency})
         raise e
 
 def main():
@@ -79,7 +88,6 @@ def main():
             category = "yellow"
             lat_c, p_tok_c, c_tok_c, t_tok_c = 0.0, 0, 0, 0
 
-        # Суммируем токены
         total_prompt_tokens = p_tok + p_tok_c
         total_completion_tokens = c_tok + c_tok_c
         total_tokens = t_tok + t_tok_c
@@ -99,7 +107,7 @@ def main():
     df = pd.DataFrame(results)
     df.to_csv("metrics.csv", index=False)
     df.to_json("metrics.json", orient="records", force_ascii=False)
-    print("\nРезультаты сохранены в metrics.json и metrics.csv (с реальными токенами API)")
+    print("\nРезультаты сохранены. Трассировка записана в логи.")
 
 if __name__ == "__main__":
     main()
