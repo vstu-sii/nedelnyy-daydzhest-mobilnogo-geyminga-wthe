@@ -1,34 +1,47 @@
-
 services:
   web:
     image: nginx:alpine
     container_name: digest-web
     ports:
-      - "8080:80"
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./src:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       api:
         condition: service_healthy
     networks:
       - digest-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 5s
     restart: unless-stopped
 
   api:
-    image: nginx:alpine
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: digest-api
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://digest_user:local_dev_password@db:5432/gaming_digest}
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - digest-network
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
-      interval: 30s
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"
+      interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 5s
+      retries: 5
+      start_period: 15s
     restart: unless-stopped
 
   worker:
@@ -51,15 +64,17 @@ services:
     image: postgres:16-alpine
     container_name: digest-db
     environment:
-      POSTGRES_DB: gaming_digest
-      POSTGRES_USER: digest_user
-      POSTGRES_PASSWORD: local_dev_password
+      POSTGRES_DB: ${POSTGRES_DB:-gaming_digest}
+      POSTGRES_USER: ${POSTGRES_USER:-digest_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local_dev_password}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - digest-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U digest_user -d gaming_digest"]
+      test:
+        - CMD-SHELL
+        - 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
       interval: 10s
       timeout: 5s
       retries: 5

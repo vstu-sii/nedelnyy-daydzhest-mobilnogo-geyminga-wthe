@@ -1,8 +1,8 @@
 up:
-	docker compose up --build
+	docker compose -f docker-compose.yml up -d --build
 
 down:
-	docker compose down
+	docker compose -f docker-compose.yml down
 
 test:
 	@echo "Tests are not configured yet"

@@ -26,4 +26,4 @@
 4. Запустить:
 
 ```bash
-docker compose up --build
+docker compose -f docker-compose.yml up -d --build
