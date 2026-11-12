@@ -1,0 +1,15 @@
+@startuml C4_Container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title C4 Container - Weekly Mobile Gaming Digest
+
+Person(reader, "Reader", "Reads mobile gaming news")
+
+System_Boundary(digest, "Weekly Mobile Gaming Digest") {
+    Container(webapp, "Web Application", "HTML, CSS, JavaScript", "Planned user interface; initial skeleton in src/index.html")
+}
+
+Rel(reader, webapp, "Opens and reads the digest", "HTTPS - planned deployment")
+
+SHOW_LEGEND()
+@enduml
