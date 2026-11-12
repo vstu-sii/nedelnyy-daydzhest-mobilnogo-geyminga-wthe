@@ -5,3 +5,6 @@ node_modules/
 .vscode/
 .idea/
 .DS_Store
+.env.production
+.env.staging
+.deploy-state
