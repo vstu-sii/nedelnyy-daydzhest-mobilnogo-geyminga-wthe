@@ -232,3 +232,68 @@ async function loadEvents() {
 // Запуск приложения
 loadNews();
 loadEvents();
+
+
+// Генерация дайджеста через API и локальную модель
+const generateButton = document.querySelector("#generate-button");
+const topicInput = document.querySelector("#topic-input");
+const generationResult = document.querySelector("#generation-result");
+
+generateButton.addEventListener("click", async () => {
+    const topic = topicInput.value.trim();
+
+    if (!topic) {
+        generationResult.textContent = "Введите тему дайджеста.";
+        return;
+    }
+
+    generateButton.disabled = true;
+    generateButton.textContent = "Генерируем...";
+    generationResult.textContent = "Модель готовит дайджест...";
+
+    try {
+        const response = await fetch("/api/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ topic })
+        });
+
+        if (!response.ok) {
+            throw new Error("Ошибка сервера: " + response.status);
+        }
+
+        const data = await response.json();
+
+        generationResult.replaceChildren();
+
+        const title = document.createElement("h3");
+        title.textContent = "Дайджест: " + data.topic;
+
+        const summary = document.createElement("p");
+        summary.textContent = data.result.summary;
+
+        const highlights = document.createElement("ul");
+
+        data.result.highlights.forEach(item => {
+            const li = document.createElement("li");
+            li.textContent = item;
+            highlights.append(li);
+        });
+
+        const status = document.createElement("p");
+        status.textContent =
+            "Сохранено в базе данных. ID записи: " + data.id;
+
+        generationResult.append(title, summary, highlights, status);
+
+    } catch (error) {
+        console.error("Ошибка генерации:", error);
+        generationResult.textContent =
+            "Не удалось создать дайджест. Попробуйте ещё раз.";
+    } finally {
+        generateButton.disabled = false;
+        generateButton.textContent = "Сгенерировать дайджест →";
+    }
+});

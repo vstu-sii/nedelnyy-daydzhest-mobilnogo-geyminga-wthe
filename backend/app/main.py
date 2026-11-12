@@ -7,6 +7,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from .model import generate_digest
 
 app = FastAPI(
     title="Gaming Digest API",
@@ -145,3 +146,39 @@ def save_model_result(result: ModelResult):
             saved_result = cursor.fetchone()
 
     return saved_result
+
+class GenerateRequest(BaseModel):
+    topic: str
+
+@app.post("/api/generate", status_code=201)
+def generate_result(request: GenerateRequest):
+    # 1. Вызываем локальную модель-заглушку
+    result = generate_digest(request.topic)
+
+    # 2. Сохраняем входные данные и результат в PostgreSQL
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO model_results (
+                    model_name,
+                    input_data,
+                    result_data
+                )
+                VALUES (%s, %s, %s)
+                RETURNING id, model_name, created_at
+            """, (
+                result["model_name"],
+                Jsonb({"topic": request.topic}),
+                Jsonb(result),
+            ))
+
+            saved_result = cursor.fetchone()
+
+    # 3. Возвращаем результат интерфейсу
+    return {
+        "id": saved_result["id"],
+        "model_name": saved_result["model_name"],
+        "topic": request.topic,
+        "result": result,
+        "created_at": saved_result["created_at"],
+    }

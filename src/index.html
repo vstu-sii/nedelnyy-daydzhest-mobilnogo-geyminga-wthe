@@ -132,6 +132,32 @@
 
             <p class="demo-note">Демонстрационные материалы для прототипа — не реальные новости.</p>
         </section>
+	
+	
+        <section class="section" id="generator">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">ЛОКАЛЬНАЯ AI-МОДЕЛЬ</p>
+                    <h2>Создать свой дайджест<span class="accent">.</span></h2>
+                </div>
+                <span class="section-counter">ГЕНЕРАЦИЯ</span>
+            </div>
+
+            <div class="generator-form">
+                <label for="topic-input">Тема игрового дайджеста</label>
+                <input
+                    type="text"
+                    id="topic-input"
+                    placeholder="Например, PUBG Mobile"
+                    value="PUBG Mobile"
+                >
+                <button class="primary-button" id="generate-button" type="button">
+                    Сгенерировать дайджест →
+                </button>
+            </div>
+
+            <div id="generation-result" aria-live="polite"></div>
+        </section>
 
         <section class="events-section" id="events">
             <div class="section-heading">
