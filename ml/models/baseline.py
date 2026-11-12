@@ -1,48 +1,33 @@
 import os
 import json
 import time
-from typing import List, Optional
+from typing import List
 from pydantic import BaseModel, Field
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
+from ml.tracing.config import setup_tracing, log_to_dashboard
 
-# --- Конфигурация ---
-API_KEY = os.getenv("OPENROUTER_API_KEY")
+# Включаем трассировку
+setup_tracing()
+
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key=API_KEY or "sk-placeholder",
+    api_key=os.environ.get("OPENROUTER_API_KEY", "sk-placeholder"),
 )
 
-MODEL_SUMMARIZE = "google/gemma-3-27b-it:free"
-MODEL_CLASSIFY = "google/gemma-3-12b-it:free"
+MODEL_SUMMARIZE = "openrouter/free"
+MODEL_CLASSIFY = "openrouter/free"
 
-# --- Структуры данных (по контракту из лабы 2) ---
 class SummaryOutput(BaseModel):
     game_id: str
-    narrative: str = Field(description="Краткое описание игры")
+    narrative: str
 
 class ClassificationOutput(BaseModel):
     game_id: str
-    category: str = Field(description="green, yellow, red, turquoise")
+    category: str
 
-# --- Логирование (Трассировка) ---
-def _log_trace(step: str, model: str, input_len: int, latency: float, status: str):
-    log_entry = {
-        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "step": step,
-        "model": model,
-        "input_chars": input_len,
-        "latency_s": round(latency, 2),
-        "status": status
-    }
-    print(json.dumps(log_entry, ensure_ascii=False))
-
-# --- Вызов LLM с ретраями ---
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def _call_llm(model: str, prompt: str, step_name: str) -> str:
-    if not API_KEY:
-        raise ValueError("OPENROUTER_API_KEY не задан")
-
     start_time = time.time()
     try:
         response = client.chat.completions.create(
@@ -52,38 +37,38 @@ def _call_llm(model: str, prompt: str, step_name: str) -> str:
             response_format={"type": "json_object"},
         )
         content = response.choices[0].message.content
-        if not content:
-            raise ValueError("Модель вернула пустой ответ")
+        latency = round(time.time() - start_time, 2)
         
-        _log_trace(step_name, model, len(prompt), time.time() - start_time, "success")
+        usage = response.usage
+        trace_data = {
+            "step": step_name,
+            "model": model,
+            "latency_s": latency,
+            "prompt": prompt,
+            "response": content,
+            "prompt_tokens": usage.prompt_tokens if usage else 0,
+            "completion_tokens": usage.completion_tokens if usage else 0,
+            "total_tokens": usage.total_tokens if usage else 0,
+            "status": "success"
+        }
+        log_to_dashboard(trace_data)
         return content
     except Exception as e:
-        _log_trace(step_name, model, len(prompt), time.time() - start_time, f"error: {str(e)}")
+        latency = round(time.time() - start_time, 2)
+        log_to_dashboard({"step": step_name, "status": f"error: {e}", "latency_s": latency})
         raise e
 
-# --- Модель ---
 class BaselineModel:
-    
     def summarize(self, game_id: str, store_text: str) -> SummaryOutput:
-        prompt = f"""Ты аналитик мобильных игр. Опиши суть игры в 3-4 предложениях на русском языке, без выдуманных деталей.
-Описание из стора: {store_text}
-
-Верни строго JSON: {{"game_id": "{game_id}", "narrative": "твой текст"}}"""
-        
+        prompt = f'Опиши игру в 3-4 предложениях. Описание: {store_text}. Верни JSON: {{"game_id": "{game_id}", "narrative": "текст"}}'
         try:
             raw = _call_llm(MODEL_SUMMARIZE, prompt, "summarize")
-            data = json.loads(raw)
-            return SummaryOutput(**data)
+            return SummaryOutput(**json.loads(raw))
         except Exception:
-            return SummaryOutput(game_id=game_id, narrative="Ошибка генерации описания")
+            return SummaryOutput(game_id=game_id, narrative="Ошибка")
 
     def classify(self, game_id: str, metrics_4w: List[float]) -> ClassificationOutput:
-        prompt = f"""Определи категорию игры по метрикам за 4 недели.
-Категории: green (рост), yellow (стагнация/всплеск), red (падение), turquoise (похож на наш проект).
-Метрики (gross_usd): {metrics_4w}
-
-Верни строго JSON: {{"game_id": "{game_id}", "category": "green|yellow|red|turquoise"}}"""
-        
+        prompt = f'Определи категорию (green, yellow, red, turquoise) по метрикам: {metrics_4w}. Верни JSON: {{"game_id": "{game_id}", "category": "green"}}'
         try:
             raw = _call_llm(MODEL_CLASSIFY, prompt, "classify")
             data = json.loads(raw)
