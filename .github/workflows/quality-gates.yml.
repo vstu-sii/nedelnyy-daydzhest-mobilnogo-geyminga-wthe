@@ -1,0 +1,42 @@
+name: Quality Gates
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    # Кэшируем зависимости, чтобы прогон занимал меньше времени
+    - name: Cache pip
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('tests/evals/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r tests/evals/requirements.txt
+
+    # Запускаем полный golden dataset. 
+    # Если скрипт упадет (sys.exit(1)), то этот шаг будет красным, 
+    # и кнопка Merge заблокируется.
+    - name: Run Full Regression Evals
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      run: |
+        cd tests/evals
+        python run_evals.py
