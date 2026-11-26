@@ -1,0 +1,194 @@
+[
+  {
+    "task": "classify",
+    "variant": "final",
+    "cases": 12,
+    "valid_outputs": 6,
+    "valid_output_rate": 0.5,
+    "correct": 4,
+    "accuracy": 0.3333333333333333,
+    "mean_latency_s": 0.89,
+    "mean_prompt_tokens": 225.41666666666666,
+    "mean_completion_tokens": 18.916666666666668,
+    "api_cost_usd": 0,
+    "errors": [
+      {
+        "game_id": "synth_004",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "recovery_01",
+        "reason": "wrong_category",
+        "expected": "yellow",
+        "predicted": "red"
+      },
+      {
+        "game_id": "small_growth_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "noise_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "synth_005",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "decline_02",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "decline_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "so_003",
+        "reason": "wrong_category",
+        "expected": "yellow",
+        "predicted": "red"
+      }
+    ]
+  },
+  {
+    "task": "classify",
+    "variant": "lab3",
+    "cases": 12,
+    "valid_outputs": 0,
+    "valid_output_rate": 0.0,
+    "correct": 0,
+    "accuracy": 0.0,
+    "mean_latency_s": 2.5987666666666667,
+    "mean_prompt_tokens": 89.41666666666667,
+    "mean_completion_tokens": 61,
+    "api_cost_usd": 0,
+    "errors": [
+      {
+        "game_id": "synth_004",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "decline_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "decline_02",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "flat_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "noise_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "synth_005",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "small_growth_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "tt_001",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "nr_002",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "recovery_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "so_003",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "growth_01",
+        "reason": "invalid_output"
+      }
+    ]
+  },
+  {
+    "task": "classify",
+    "variant": "lab4",
+    "cases": 12,
+    "valid_outputs": 12,
+    "valid_output_rate": 1.0,
+    "correct": 10,
+    "accuracy": 0.8333333333333334,
+    "mean_latency_s": 0.7921416666666666,
+    "mean_prompt_tokens": 203.41666666666666,
+    "mean_completion_tokens": 17.916666666666668,
+    "api_cost_usd": 0,
+    "errors": [
+      {
+        "game_id": "recovery_01",
+        "reason": "wrong_category",
+        "expected": "yellow",
+        "predicted": "green"
+      },
+      {
+        "game_id": "small_growth_01",
+        "reason": "wrong_category",
+        "expected": "yellow",
+        "predicted": "green"
+      }
+    ]
+  },
+  {
+    "task": "summarize",
+    "variant": "final",
+    "cases": 12,
+    "valid_outputs": 12,
+    "valid_output_rate": 1.0,
+    "correct": null,
+    "accuracy": null,
+    "mean_latency_s": 2.414,
+    "mean_prompt_tokens": 242,
+    "mean_completion_tokens": 54,
+    "api_cost_usd": 0,
+    "errors": []
+  },
+  {
+    "task": "summarize",
+    "variant": "lab4",
+    "cases": 12,
+    "valid_outputs": 10,
+    "valid_output_rate": 0.8333333333333334,
+    "correct": null,
+    "accuracy": null,
+    "mean_latency_s": 2.9640166666666667,
+    "mean_prompt_tokens": 184.83333333333334,
+    "mean_completion_tokens": 69.33333333333333,
+    "api_cost_usd": 0,
+    "errors": [
+      {
+        "game_id": "decline_01",
+        "reason": "invalid_output"
+      },
+      {
+        "game_id": "decline_02",
+        "reason": "invalid_output"
+      }
+    ]
+  },
+  {
+    "task": "summarize",
+    "variant": "without_grounding",
+    "cases": 12,
+    "valid_outputs": 12,
+    "valid_output_rate": 1.0,
+    "correct": null,
+    "accuracy": null,
+    "mean_latency_s": 4.231416666666667,
+    "mean_prompt_tokens": 189,
+    "mean_completion_tokens": 98.66666666666667,
+    "api_cost_usd": 0,
+    "errors": []
+  }
+]
