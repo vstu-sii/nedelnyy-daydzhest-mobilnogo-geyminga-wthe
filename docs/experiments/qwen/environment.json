@@ -1,0 +1,19 @@
+{
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "model_commit": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "gpu": "Tesla T4",
+  "python": "3.13.16",
+  "torch": "2.14.1+cu130",
+  "transformers": "4.48.3",
+  "dtype": "torch.float16",
+  "generation": {
+    "max_new_tokens": 256,
+    "do_sample": false,
+    "temperature": null,
+    "top_p": null,
+    "top_k": null,
+    "pad_token_id": 151645
+  },
+  "timestamp": "2026-11-26T18:15:19.904645+00:00",
+  "dataset_sha256": "7e5dabcc40528f4546f11f0756ee4fc707bb07c4e9f13303b345b51f49e7a72c"
+}
