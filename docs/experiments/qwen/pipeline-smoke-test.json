@@ -1,0 +1,14 @@
+{
+  "game_id": "so_003",
+  "narrative": "Это симулятор фермы, где игроки выращивают сад и собирают урожай.",
+  "category": "yellow",
+  "classification_method": "rules-v1",
+  "review_required": true,
+  "publication_status": "draft",
+  "generation_metadata": {
+    "latency_s": 2.4674,
+    "prompt_tokens": 244,
+    "completion_tokens": 45,
+    "model": "Qwen/Qwen2.5-3B-Instruct"
+  }
+}
