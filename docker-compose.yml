@@ -1,7 +1,7 @@
+
 services:
   web:
     image: nginx:alpine
-    container_name: digest-web
     ports:
       - "${WEB_PORT:-8080}:80"
     volumes:
@@ -23,7 +23,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: digest-api
     environment:
       APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: ${DATABASE_URL:-postgresql://digest_user:local_dev_password@db:5432/gaming_digest}
@@ -46,7 +45,6 @@ services:
 
   worker:
     image: alpine:3.20
-    container_name: digest-worker
     command:
       - /bin/sh
       - -c
@@ -62,7 +60,6 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: digest-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-gaming_digest}
       POSTGRES_USER: ${POSTGRES_USER:-digest_user}

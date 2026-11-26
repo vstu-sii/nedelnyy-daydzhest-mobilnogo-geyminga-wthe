@@ -1,8 +1,9 @@
+
 services:
   web:
     image: artemchuvilini/gaming-digest-web:${IMAGE_TAG:-lab4-test}
     container_name: digest-staging-web
-    ports:
+    ports: !override
       - "8081:80"
     volumes: !override []
 
