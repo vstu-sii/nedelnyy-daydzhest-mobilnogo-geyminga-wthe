@@ -1,0 +1,278 @@
+{
+  "release_tag": "lab5-ai-v1",
+  "commit": "919e70f3ddd07702991199d978b3ee0519f1c17c",
+  "timestamp": "2026-11-26T19:25:05.962407+00:00",
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "model_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "gpu": "Tesla T4",
+  "torch": "2.14.1+cu130",
+  "transformers": "4.48.3",
+  "dataset_sha256": "c4c96fe6ab7c0b15592acdecc66482e15dc963dd19da6bf7814e678f9521c900",
+  "cases": 12,
+  "successful_cards": 12,
+  "valid_card_rate": 1.0,
+  "classification_accuracy": 1.0,
+  "scenario_seconds": 27.904198073999396,
+  "mean_end_to_end_latency_s": 2.325165081833044,
+  "session_seconds_including_load_and_warmup": 64.41925195499971,
+  "api_cost_usd": 0,
+  "gpu_hour_usd": 0.0,
+  "scenario_compute_cost_usd": 0.0,
+  "session_compute_cost_usd": 0.0,
+  "cost_scope": "GPU-вычисления по указанному тарифу; сопровождение, хранение и редактура не включены.",
+  "quality_scope": "Категории проверены по политике команды. Валидность карточки не доказывает точность описания.",
+  "rows": [
+    {
+      "game_id": "nr_002",
+      "status": "success",
+      "expected_category": "green",
+      "category_correct": true,
+      "card": {
+        "game_id": "nr_002",
+        "narrative": "Это командный шутер в формате 3 против 3 с короткими матчами. Включает сезонные пропуски.",
+        "category": "green",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.1597,
+          "prompt_tokens": 250,
+          "completion_tokens": 53,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.1615452289997847
+    },
+    {
+      "game_id": "tt_001",
+      "status": "success",
+      "expected_category": "green",
+      "category_correct": true,
+      "card": {
+        "game_id": "tt_001",
+        "narrative": "Это мелкая головоломка-игра, где игроки должны восстанавливать таверну путем слияния блоков. Игра направлена на тех, кто ищет простые и увлекательные мини-игры для развлечения.",
+        "category": "green",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 3.321,
+          "prompt_tokens": 240,
+          "completion_tokens": 83,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 3.3230745669998214
+    },
+    {
+      "game_id": "so_003",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "so_003",
+        "narrative": "Это симулятор фермы, где игроки выращивают сад и собирают урожай.",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.1306,
+          "prompt_tokens": 244,
+          "completion_tokens": 45,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.1327555309999298
+    },
+    {
+      "game_id": "synth_004",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "synth_004",
+        "narrative": "Это космический idle-симулятор, в котором игроки могут управлять кораблем и взаимодействовать с другими игроками в формате PvP (Play to Win).",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.9461,
+          "prompt_tokens": 236,
+          "completion_tokens": 65,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.948799239999971
+    },
+    {
+      "game_id": "synth_005",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "synth_005",
+        "narrative": "Это коллекционная карточная игра, в которой игроки сражаются друг с другом в пошаговых боях.",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.0879,
+          "prompt_tokens": 244,
+          "completion_tokens": 52,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.0898938410000483
+    },
+    {
+      "game_id": "decline_01",
+      "status": "success",
+      "expected_category": "red",
+      "category_correct": true,
+      "card": {
+        "game_id": "decline_01",
+        "narrative": "Это гоночная игра, в которой игрок выбирает автомобиль и проходит различные трассы.",
+        "category": "red",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 1.7172,
+          "prompt_tokens": 241,
+          "completion_tokens": 42,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 1.7194350389991087
+    },
+    {
+      "game_id": "decline_02",
+      "status": "success",
+      "expected_category": "red",
+      "category_correct": true,
+      "card": {
+        "game_id": "decline_02",
+        "narrative": "Это головоломка на поиск слов, где слова формируются из букв. Игра не содержит дополнительных механик, наград, режимов или сюжета.",
+        "category": "red",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 3.0187,
+          "prompt_tokens": 240,
+          "completion_tokens": 61,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 3.020728816999508
+    },
+    {
+      "game_id": "flat_01",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "flat_01",
+        "narrative": "Это симулятор кафе, где игрок принимает заказы клиентов и готовит различные напитки.",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 1.8005,
+          "prompt_tokens": 241,
+          "completion_tokens": 43,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 1.802679901999909
+    },
+    {
+      "game_id": "noise_01",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "noise_01",
+        "narrative": "Это мобильная игра, в которой игроки ловят рыбу и собирают коллекцию рыб.",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.1819,
+          "prompt_tokens": 243,
+          "completion_tokens": 42,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.1847243209995213
+    },
+    {
+      "game_id": "growth_01",
+      "status": "success",
+      "expected_category": "green",
+      "category_correct": true,
+      "card": {
+        "game_id": "growth_01",
+        "narrative": "Это стратегическая игра с элементами пошаговых боёв и строительства базы.",
+        "category": "green",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 1.7559,
+          "prompt_tokens": 243,
+          "completion_tokens": 43,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 1.7589593429993329
+    },
+    {
+      "game_id": "small_growth_01",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "small_growth_01",
+        "narrative": "Это мобильная версия игры в судоку, где игроки получают ежедневные задания для заполнения квадратиков в соответствии с правилами судоку.",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.5132,
+          "prompt_tokens": 236,
+          "completion_tokens": 63,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.5155436549994192
+    },
+    {
+      "game_id": "recovery_01",
+      "status": "success",
+      "expected_category": "yellow",
+      "category_correct": true,
+      "card": {
+        "game_id": "recovery_01",
+        "narrative": "Это платформерная игра, где игрок управляет персонажем, который должен прыгать между платформами и собирать монеты.",
+        "category": "yellow",
+        "classification_method": "rules-v1",
+        "review_required": true,
+        "publication_status": "draft",
+        "generation_metadata": {
+          "latency_s": 2.2418,
+          "prompt_tokens": 246,
+          "completion_tokens": 56,
+          "model": "Qwen/Qwen2.5-3B-Instruct"
+        }
+      },
+      "end_to_end_latency_s": 2.243841497000176
+    }
+  ]
+}
