@@ -1,0 +1,47 @@
+name: Lab5 AI checks
+
+on:
+  push:
+    branches:
+      - lab5-ai-engineer-testing
+    tags:
+      - "lab5-ai-v*"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-evals:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tested revision
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Record tested revision
+        run: |
+          git rev-parse HEAD
+          echo "Ref: $GITHUB_REF"
+
+      - name: Run regression tests
+        run: |
+          python -m unittest discover \
+            -s evals -p "test_*.py" -v
+
+      - name: Recalculate saved Qwen metrics
+        run: python evals/summarize_results.py
+
+      - name: Upload recalculated metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab5-offline-metrics
+          path: docs/experiments/qwen/summary.json
