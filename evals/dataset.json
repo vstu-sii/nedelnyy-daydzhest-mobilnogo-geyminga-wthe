@@ -1,0 +1,74 @@
+[
+  {
+    "game_id": "nr_002",
+    "store_description": "Командный шутер 3v3 с короткими матчами. Сезонные пропуска.",
+    "metrics_4w": [100, 120, 140, 160],
+    "expected_category": "green"
+  },
+  {
+    "game_id": "tt_001",
+    "store_description": "Merge-головоломка. Восстанавливайте таверну.",
+    "metrics_4w": [500, 600, 700, 800],
+    "expected_category": "green"
+  },
+  {
+    "game_id": "so_003",
+    "store_description": "Farm-симулятор. Выращивайте сад, собирайте урожай.",
+    "metrics_4w": [100, 95, 90, 200],
+    "expected_category": "yellow"
+  },
+  {
+    "game_id": "synth_004",
+    "store_description": "Космический idle-симулятор с PvP.",
+    "metrics_4w": [300, 280, 260, 500],
+    "expected_category": "yellow"
+  },
+  {
+    "game_id": "synth_005",
+    "store_description": "Коллекционная карточная игра с пошаговыми боями.",
+    "metrics_4w": [150, 140, 130, 280],
+    "expected_category": "yellow"
+  },
+  {
+    "game_id": "decline_01",
+    "store_description": "Гоночная игра. Игрок выбирает автомобиль и проходит трассы.",
+    "metrics_4w": [400, 350, 300, 250],
+    "expected_category": "red"
+  },
+  {
+    "game_id": "decline_02",
+    "store_description": "Головоломка на поиск слов. Слова составляются из букв.",
+    "metrics_4w": [100, 92, 84, 76],
+    "expected_category": "red"
+  },
+  {
+    "game_id": "flat_01",
+    "store_description": "Симулятор кафе. Игрок принимает заказы и готовит напитки.",
+    "metrics_4w": [100, 101, 99, 100],
+    "expected_category": "yellow"
+  },
+  {
+    "game_id": "noise_01",
+    "store_description": "Игра про рыбалку. Игрок ловит рыбу и собирает коллекцию.",
+    "metrics_4w": [100, 115, 107, 118],
+    "expected_category": "yellow"
+  },
+  {
+    "game_id": "growth_01",
+    "store_description": "Стратегия с пошаговыми боями и строительством базы.",
+    "metrics_4w": [200, 220, 240, 260],
+    "expected_category": "green"
+  },
+  {
+    "game_id": "small_growth_01",
+    "store_description": "Судоку с ежедневными заданиями.",
+    "metrics_4w": [100, 102, 104, 106],
+    "expected_category": "yellow"
+  },
+  {
+    "game_id": "recovery_01",
+    "store_description": "Платформер. Герой прыгает между платформами и собирает монеты.",
+    "metrics_4w": [200, 100, 150, 190],
+    "expected_category": "yellow"
+  }
+]
