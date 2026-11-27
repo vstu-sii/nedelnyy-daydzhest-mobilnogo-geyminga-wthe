@@ -1,0 +1,35 @@
+
+services:
+  web:
+    image: artemchuvilini/gaming-digest-web:${IMAGE_TAG:-latest}
+    container_name: digest-prod-web
+    ports:
+      - "8080:80"
+    volumes: !override []
+
+  api:
+    image: artemchuvilini/gaming-digest-api:${IMAGE_TAG:-latest}
+    container_name: digest-prod-api
+    build: !reset null
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://digest_user:${PROD_DB_PASSWORD}@db:5432/gaming_digest
+
+  db:
+    container_name: digest-prod-db
+    environment:
+      POSTGRES_DB: gaming_digest
+      POSTGRES_USER: digest_user
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+    volumes: !override
+      - prod-postgres-data:/var/lib/postgresql/data
+      - ./database/migrations/002_postgresql_schema.sql:/docker-entrypoint-initdb.d/002_postgresql_schema.sql:ro
+      - ./database/migrations/003_seed_demo_data.sql:/docker-entrypoint-initdb.d/003_seed_demo_data.sql:ro
+
+volumes:
+  prod-postgres-data:
+
+networks:
+  digest-network:
+    name: digest-prod-network
+    driver: bridge
