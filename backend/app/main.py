@@ -97,8 +97,11 @@ LIMIT_REJECTIONS = Counter(
     ["limit_type"],
 )
 
-# Demonstration spend metrics.
-# Replace estimated costs with provider billing data in production.
+MODEL_FAILURES = Counter(
+    "model_generation_failures_total",
+    "Total model generation failures",
+)
+
 MODEL_ESTIMATED_SPEND = Gauge(
     "model_estimated_spend_usd",
     "Estimated model spending in USD for the current day",
@@ -238,25 +241,17 @@ SPEND_ALERT_THRESHOLD = float(
     os.getenv("SPEND_ALERT_THRESHOLD", "0.80")
 )
 
-# Demonstration price per 1000 estimated tokens.
-# This is NOT a real provider price.
 DEMO_PRICE_PER_1000_TOKENS = float(
     os.getenv("DEMO_PRICE_PER_1000_TOKENS", "0.002")
 )
 
 
 def estimate_tokens(result: dict[str, Any]) -> int:
-    """
-    Approximate token count for the local demo model.
-    Replace with actual provider usage when a real LLM is connected.
-    """
     text = str(result)
     return max(1, len(text) // 4)
 
 
 def estimate_cost_usd(tokens: int) -> float:
-    """Calculate demonstration cost from estimated token count."""
-
     return (
         tokens / 1000
     ) * DEMO_PRICE_PER_1000_TOKENS
@@ -266,11 +261,6 @@ def check_spend_alert(
     user_id: str,
     estimated_tokens: int,
 ) -> float:
-    """
-    Calculate demonstration daily spending and emit a warning
-    when the configured threshold is reached.
-    """
-
     estimated_cost = estimate_cost_usd(estimated_tokens)
 
     with get_connection() as connection:
@@ -282,7 +272,6 @@ def check_spend_alert(
                 WHERE usage_date = CURRENT_DATE
                 """
             )
-
             usage = cursor.fetchone()
 
     total_tokens = int(usage["total_tokens"])
@@ -327,11 +316,6 @@ def reserve_daily_usage(
     user_id: str,
     estimated_tokens: int,
 ) -> None:
-    """
-    Atomically reserve one request and estimated tokens.
-    PostgreSQL protects concurrent updates using ON CONFLICT.
-    """
-
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
@@ -427,6 +411,39 @@ def reserve_daily_usage(
     raise HTTPException(
         status_code=429,
         detail="Превышен дневной лимит токенов",
+    )
+
+
+def release_daily_usage(
+    user_id: str,
+    estimated_tokens: int,
+) -> None:
+    """
+    Release the reservation after a failed model generation.
+    """
+
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE model_usage
+                SET
+                    request_count = GREATEST(request_count - 1, 0),
+                    token_count = GREATEST(token_count - %s, 0),
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = %s
+                  AND usage_date = CURRENT_DATE
+                """,
+                (
+                    estimated_tokens,
+                    user_id,
+                ),
+            )
+
+    logger.info(
+        "model_usage_released user_id=%s tokens=%s",
+        user_id,
+        estimated_tokens,
     )
 
 
@@ -578,7 +595,7 @@ class GenerateRequest(BaseModel):
 
 
 # --------------------------------------------------
-# Generate digest with limits and spend alerts
+# Generate digest with fault tolerance
 # --------------------------------------------------
 
 @app.post("/api/generate", status_code=201)
@@ -599,7 +616,6 @@ def generate_result(
             "digest.topic",
             request.topic,
         )
-
         generation_span.set_attribute(
             "user.id",
             user_id,
@@ -610,30 +626,59 @@ def generate_result(
             len(request.topic) // 4,
         ) + 500
 
-        # Check daily spending budget before generation.
         check_spend_alert(
             user_id,
             estimated_tokens,
         )
 
-        # Reserve daily request and token usage.
         reserve_daily_usage(
             user_id,
             estimated_tokens,
         )
 
-        with tracer.start_as_current_span("model.generate") as model_span:
-            model_span.set_attribute(
-                "model.operation",
-                "generate_digest",
+        try:
+            with tracer.start_as_current_span("model.generate") as model_span:
+                model_span.set_attribute(
+                    "model.operation",
+                    "generate_digest",
+                )
+
+                result = generate_digest(request.topic)
+
+                model_span.set_attribute(
+                    "model.name",
+                    str(result.get("model_name", "unknown")),
+                )
+
+        except Exception as error:
+            MODEL_FAILURES.inc()
+
+            logger.exception(
+                "model_generation_failed user_id=%s topic=%s",
+                user_id,
+                request.topic,
             )
 
-            result = generate_digest(request.topic)
-
-            model_span.set_attribute(
-                "model.name",
-                str(result.get("model_name", "unknown")),
+            generation_span.set_attribute(
+                "model.generation_failed",
+                True,
             )
+
+            try:
+                release_daily_usage(
+                    user_id,
+                    estimated_tokens,
+                )
+            except Exception:
+                logger.exception(
+                    "model_usage_release_failed user_id=%s",
+                    user_id,
+                )
+
+            raise HTTPException(
+                status_code=503,
+                detail="Сервис генерации временно недоступен. Попробуйте позже.",
+            ) from error
 
         actual_tokens = estimate_tokens(result)
 
@@ -660,7 +705,6 @@ def generate_result(
                     ),
                 )
 
-        # Update the demonstration spend metric after generation.
         with get_connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -670,7 +714,6 @@ def generate_result(
                     WHERE usage_date = CURRENT_DATE
                     """
                 )
-
                 usage = cursor.fetchone()
 
         daily_spend = estimate_cost_usd(
@@ -717,17 +760,14 @@ def generate_result(
             "database.record_id",
             saved_result["id"],
         )
-
         generation_span.set_attribute(
             "model.estimated_tokens",
             estimated_tokens,
         )
-
         generation_span.set_attribute(
             "model.actual_tokens_estimate",
             actual_tokens,
         )
-
         generation_span.set_attribute(
             "model.estimated_cost_usd",
             daily_spend,
